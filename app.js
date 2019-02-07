@@ -32,13 +32,23 @@ var UIController = (function () {
 var controller = (function (budgetCtrl, UICtrl) {
   // write code here...
 
-  var DOM = UICtrl.getDOMstrings ();
+  var setupEventListener = function () {
+    var DOM = UICtrl.getDOMstrings ();
+    document
+      .querySelector (DOM.inputBtn)
+      .addEventListener ('click', ctrlAddItem);
+
+    document.addEventListener ('keypress', function (e) {
+      if (e.key === 'Enter' && e.keyCode === 13) {
+        ctrlAddItem ();
+      }
+    });
+  };
 
   var ctrlAddItem = function () {
     // TODO LIST
     // 1. Get the field input data
     var input = UICtrl.getInput ();
-    console.log (input);
 
     // 2. Add the item to the budget controller
     // 3. Add the item to the UI
@@ -46,11 +56,12 @@ var controller = (function (budgetCtrl, UICtrl) {
     // 5. Display the budget on the UI
   };
 
-  document.querySelector (DOM.inputBtn).addEventListener ('click', ctrlAddItem);
-
-  document.addEventListener ('keypress', function (e) {
-    if (e.key === 'Enter' && e.keyCode === 13) {
-      ctrlAddItem ();
-    }
-  });
+  return {
+    init: function () {
+      console.log ('Application has started');
+      setupEventListener ();
+    },
+  };
 }) (budgetController, UIController);
+
+controller.init ();
