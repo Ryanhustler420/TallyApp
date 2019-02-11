@@ -55,6 +55,17 @@ var budgetController = (function () {
       data.allItems[type].push (newItem);
       return newItem;
     },
+    deleteItem: function (type, id) {
+      var ids = data.allItems[type].map (cost => {
+        return cost.id;
+      });
+
+      index = ids.indexOf (id);
+
+      if (index !== -1) {
+        data.allItems[type].splice (index, 1);
+      }
+    },
     calculateBudget: function () {
       // calculate total income and expenses
       calculateTotal ('exp');
@@ -229,9 +240,10 @@ var controller = (function (budgetCtrl, UICtrl) {
       // inc-0, inc-2
       splitID = itemID.split ('-');
       type = splitID[0];
-      ID = splitID[1];
+      ID = +splitID[1];
 
       // 1. delete the item from the dara structure
+      budgetCtrl.deleteItem (type, ID);
 
       // 2. Delete the item from the UI
 
