@@ -6,6 +6,17 @@ var budgetController = (function () {
     this.id = id;
     this.description = description;
     this.value = value;
+    this.percentage = -1;
+  };
+
+  Expense.prototype.calculatePercentages = function (totalIncome) {
+    if (totalIncome > 0)
+      this.percentage = Math.round (this.value / totalIncome * 100);
+    else this.percentage = -1;
+  };
+
+  Expense.prototype.getPercentage = function () {
+    return this.percentage;
   };
 
   var Income = function (id, description, value) {
@@ -87,6 +98,41 @@ var budgetController = (function () {
         totalExp: data.totals.exp,
       };
     },
+    calculatePercentages: function () {
+      /**
+       * a = 20
+       * b = 10
+       * c = 40
+       * 
+       * income = 100
+       * 
+       * a = 20/100 = 20%
+       * b = 10/100 = 10%
+       * c = 40/100 = 40%
+       */
+
+      data.allItems.exp.forEach (cur => {
+        cur.calculatePercentages (data.totals.inc);
+      });
+
+      /**
+       * {
+       *  value : 20;
+       *  percentage = -1
+       * }
+       *                    ( 20   / currentTotalInc * 100)
+       *  this.percentage = (value / totalExp * 100)
+       */
+    },
+
+    getPercentage: function () {
+      var allPercentage = data.allItems.exp.map (cur => {
+        return cur.getPercentage ();
+      });
+
+      return allPercentage;
+      // [10%, 23%, 56%]
+    },
     testing: function () {
       console.log (data);
     },
@@ -136,7 +182,7 @@ var UIController = (function () {
       newHtml = html.replace (`%id%`, obj.id);
       newHtml = newHtml.replace (`%description%`, obj.description);
       newHtml = newHtml.replace (`%value%`, obj.value);
-
+      //
       // Insert the HTML into the DOM
       document
         .querySelector (element)
@@ -216,8 +262,11 @@ var controller = (function (budgetCtrl, UICtrl) {
 
   updatePercentages = function () {
     // 1. Calculate percentages
+    budgetCtrl.calculatePercentages ();
     // 2. Read percentages from the budget controller
+    var percentages = budgetCtrl.getPercentage ();
     // 3. Update the UI with new percentage
+    console.log (percentages);
   };
 
   var ctrlAddItem = function () {
